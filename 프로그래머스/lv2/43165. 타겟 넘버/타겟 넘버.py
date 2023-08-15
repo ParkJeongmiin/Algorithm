@@ -1,24 +1,20 @@
-answer = 0
-
-def dfs(idx, numbers, target, value):
-    global answer
-    
-    length = len(numbers)
-    
-    # 전부 다 계산했을 때, target 값과 같은 경우, 정답 1 증가
-    if idx == length and target == value:
-        answer += 1
-        return
-    
-    # 전부 다 계산했을 때, target 값과 다른 경우
-    if idx == length:
-        return
-    
-    # 현재 값을 +, -해서 value로 설정, 다음 index 값을 계산하기 위해 dfs 반복
-    dfs(idx + 1, numbers, target, value + numbers[idx])
-    dfs(idx + 1, numbers, target, value - numbers[idx])
+from collections import deque
 
 def solution(numbers, target):
-    global answer
-    dfs(0, numbers, target, 0)
+    
+    answer = 0
+    queue = deque()     # queue 생성
+    
+    length = len(numbers)   # 끝났을 때 값 비교를 위해서
+    queue.append([-numbers[0], 0])  # 해당 노드의 값, 현재 깊이-1 저장
+    queue.append([+numbers[0], 0])
+    
+    while queue:
+        num, i = queue.popleft()
+        if i + 1 == length:     # 현재 노드가 마지막 노드이고
+            if num == target: answer += 1   # target 과 일치하다면 answer 1 증가
+        else:                   # 마지막이 아니라면
+            queue.append([num - numbers[i+1], i+1]) # queue에 [node value, 현재 깊이-1] 저장
+            queue.append([num + numbers[i+1], i+1])
+    
     return answer
