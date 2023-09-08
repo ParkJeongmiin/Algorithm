@@ -1,14 +1,11 @@
-from collections import deque
-
 def solution(s):
     answer = True
     recv = []
-    s = deque(list(s))
     
-    while len(s) != 0:
-        recv.append(s.popleft())
+    for i in s:
+        recv.append(i)
         
-        if recv[-2:] == ["(",")"]:
+        if recv[-2:] == ["(", ")"]:
             recv.pop()
             recv.pop()
     
