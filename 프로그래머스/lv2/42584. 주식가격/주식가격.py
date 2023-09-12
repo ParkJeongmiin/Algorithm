@@ -1,13 +1,15 @@
 def solution(prices):
-    size = len(prices)
-    answer = [0] * size
+    stack = []
+    answer = [0] * len(prices)
     
-    for i in range(size):
-        for j in range(i+1, size):
-            if prices[i] <= prices[j]:   # 상승세이면
-                answer[i] += 1
-            else:
-                answer[i] += 1
-                break
-                
+    # 스택 풀이
+    for idx, price in enumerate(prices):
+        while stack and prices[stack[-1]] > price:  # 하락세인 경우
+            past_idx = stack.pop()                  # pop
+            answer[past_idx] = idx - past_idx       # 시간 초기화
+        stack.append(idx)
+        
+    for idx in stack:
+        answer[idx] = len(prices) - idx - 1
+            
     return answer
