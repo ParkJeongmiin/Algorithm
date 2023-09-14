@@ -7,31 +7,17 @@
         False : 
     2) answer.append(rank[-1])
 """
-from collections import deque
-
 def solution(k, score):
     answer = []
     rank = []
-    day = 0
-    score = deque(score)
     
-    if k > len(score):
-        for idx in range(len(score)):
-            rank.append(score.popleft())
-            answer.append(min(rank))
-    else:
-        while day != k:
-            rank.append(score.popleft())
-            answer.append(min(rank))
-            day += 1
-            
-        while score:
-            today_score = score.popleft()
-            
-            if today_score >= min(rank):
-                rank.append(today_score)
-                rank.remove(min(rank))
-                
-            answer.append(min(rank))
+    for today_score in score:
+        
+        rank.append(today_score)
     
+        if len(rank) > k:
+            rank.remove(min(rank))
+            
+        answer.append(min(rank))
+        
     return answer
