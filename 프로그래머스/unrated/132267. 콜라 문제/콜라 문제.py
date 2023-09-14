@@ -9,13 +9,14 @@ def solution(a, b, n):
     answer = 0
 
     while n >= a:
-        give = (n//a) * a
+        remain = n % a
         recv = (n//a) * b
     
-        n = n - give + recv
-        if n >= a:
-            answer += recv
-        else:
-            answer += recv
+        n = remain + recv
+        # if n >= a:
+        #     answer += recv
+        # else:
+        #     answer += recv
+        answer += recv
         
     return answer
