@@ -9,15 +9,12 @@ while ingredient:
     1) 뒤에서 부터 4개가 [1,2,3,1] 이면 : pop 4번, answer += 1
             
 """
-from collections import deque
-
 def solution(ingredient):
     answer = 0
-    ingredient = deque(ingredient)
     now_element = []
     
-    while ingredient:
-        now_element.append(ingredient.popleft())
+    for i in ingredient:
+        now_element.append(i)
         
         if len(now_element) >= 4:
             if now_element[-4:] == [1, 2, 3, 1]:
