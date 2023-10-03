@@ -16,7 +16,8 @@ def solution(picks, minerals):
             count_list[idx // 5][1] += 1
         elif minerals[idx] == 'stone':
             count_list[idx // 5][2] += 1
-            
+    
+    # 광물 개수 피로도 높은 것 순으로 내림차순
     sorted_count_list = sorted(count_list, key = lambda x : (-x[0], -x[1], -x[2]))
     
     # 피로도 계산
