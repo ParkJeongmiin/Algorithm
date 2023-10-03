@@ -8,5 +8,4 @@ def hanoi(n, start, to, mid, answer):
 def solution(n):
     answer = []
     hanoi(n, 1, 3, 2, answer)
-    print(answer)
     return answer
