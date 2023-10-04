@@ -7,7 +7,6 @@ def solution(storey):
         check_num = storey % 10
         storey = storey // 10
         
-        # 돌 어떻게 쓸지 판단
         if check_num < 5:       # 5 미만이면 -1 로 전부 쓴다.
             answer += check_num
         elif check_num == 5:
