@@ -1,14 +1,17 @@
-from collections import Counter
-
 def solution(lottos, win_nums):
-    rank = {6:1, 5:2, 4:3, 3:4, 2:5, 1:6, 0:6}
+    answer = []
+    rank = [6, 6, 5, 4, 3, 2, 1]
     
-    lottos = Counter(lottos)
-    win_nums = Counter(win_nums)
-
-    correct_num = len(win_nums) - len(win_nums - lottos)
-
-    good_rank = correct_num + lottos[0]
-    bad_rank = correct_num
+    correct = 0
+    zero_count = 0
     
-    return [rank[good_rank], rank[bad_rank]]
+    for lotto in lottos:
+        if lotto in win_nums:
+            correct += 1
+        elif lotto == 0:
+            zero_count += 1
+            
+    max_count = correct + zero_count
+    min_count = correct
+    
+    return [rank[max_count], rank[min_count]]
