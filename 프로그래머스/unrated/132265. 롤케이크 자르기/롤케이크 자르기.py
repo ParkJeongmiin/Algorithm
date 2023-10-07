@@ -3,11 +3,12 @@ from collections import defaultdict, Counter
 def solution(topping):
     answer = 0
     
-    old = defaultdict(int)
+    # old = defaultdict(int)
+    old = set()
     young = Counter(topping)
     
     for top in topping:
-        old[top] += 1
+        old.add(top)
         young[top] -= 1
         
         if young[top] <= 0:
