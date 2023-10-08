@@ -14,6 +14,6 @@ def solution(k, room_number):
     
     rooms = dict()
     for num in room_number:
-        chk_in = find(num, rooms)
+        find(num, rooms)
     
     return list(rooms)
