@@ -2,25 +2,23 @@ def solution(sequence, k):
     answer = []
     
     size = len(sequence)
-    front = back = 0
-    total = sequence[0]
+    front, back = 0, -1
+    total = 0
     
-    while back < size:
-        length = back - front + 1
-        
-        if total == k:
-            answer.append([length, front, back])
-            back += 1
-            if back == size: break
-            total += sequence[back]
-        elif total < k:
+    while front < size:
+        if total < k:
             back += 1
             if back == size: break
             total += sequence[back]
         else:
             total -= sequence[front]
+            if front >= size:
+                break
             front += 1
-
-    answer = sorted(answer, key = lambda x : (x[0], x[1]))
+            
+        if total == k:
+            answer.append([front, back])
     
-    return [answer[0][1], answer[0][2]]
+    answer = sorted(answer, key = lambda x : (x[1] - x[0], x[0]))
+    
+    return answer[0]
