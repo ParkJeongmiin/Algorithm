@@ -8,10 +8,8 @@ def solution(schedules, timelogs, startday):
         for j in range(7):
             if day == 6:        # 토요일
                 day += 1
-                continue
             elif day == 7:      # 일요일
                 day = 1
-                continue
             else:               # 평일
                 if end_time < time2min(timelogs[i][j]):   # 지각
                     break
