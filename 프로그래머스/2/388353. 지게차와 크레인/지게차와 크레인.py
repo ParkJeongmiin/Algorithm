@@ -1,60 +1,78 @@
-def fork(storage, box): # 지게차
-    dx, dy = [0, 0, 1, -1], [1, -1, 0, 0]
-    index = []
+# 크레인 모드
+def crane(storage, request):
+    """
+    일치하는 컨테이너는 꺼내고 주변 확인 후, 외부(0) 또는 내부(1)로 표시
+    """    
+    for i in range(1, len(storage) - 1):
+        for j in range(1, len(storage[0]) - 1):
+            if storage[i][j] == request:
+                storage[i][j] = "1"
+                update(storage, i, j)                
     
-    for i in range(1, len(storage)-1):
-        for j in range(1, len(storage[0])-1):
-            if storage[i][j] == box:
+
+# 지게차 모드
+def fork(storage, request):
+    """
+    일치하는 컨테이너 발견 시, 주변에 하나라도 외부(0)이 존재할 때 변경할 리스트에 저장하고
+    변경되는 점을 하나씩 처리하면서 외부와 연결된 점을 업데이트
+    -> 실시간으로 바꿔가면 접근이 불가능했던 컨테이너도 꺼내는 문제점이 발생하기 때문
+    """
+    dx, dy = [0, 0, 1, -1], [1, -1, 0, 0]
+    changed_idx = []
+    
+    for i in range(1, len(storage) - 1):
+        for j in range(1, len(storage[0]) - 1):
+            if storage[i][j] == request:
                 for k in range(4):
                     nx, ny = i + dx[k], j + dy[k]
-                    if storage[nx][ny] == "0":  # 지게차로 꺼낼 수 있으면 (외부쪽 박스)
-                        index.append((i, j))    # 위치 저장(바로 꺼내면 옆에있는 박스도 꺼낼 수 있게 됨)
+                    if storage[nx][ny] == "0":
+                        changed_idx.append((i, j))
                         break
-    
-    for i, j in index:  # 저장된 박스 꺼내기
+                        
+    for i, j in changed_idx:
         storage[i][j] = "0"
-        isOutside(storage, i, j) # 주변에 빈 공간있으면 외부랑 연결
+        update(storage, i, j)    
 
-def crane(storage, box): # 크레인
-    for i in range(1, len(storage)-1):
-        for j in range(1, len(storage[0])-1):
-            if storage[i][j] == box:
-                storage[i][j] = "1"
-                isOutside(storage, i, j) # 주변에 빈 공간있으면 외부랑 연결
 
-def isOutside(storage, x, y):   # 박스 꺼냈을 때 외부랑 연결된 공간 찾아서 연결
+# 변경 후 상황 업데이트
+def update(storage, x, y):
+    """
+    주어진 위치 주변에 외부(0)인 지점이 있는지 찾고 하나라도 있다면 입력받은 지점을 외부(0)로 표시
+    """
     dx, dy = [0, 0, 1, -1], [1, -1, 0, 0]
-    outside = False
-
+    flag = False
+    
     for i in range(4):
         nx, ny = x + dx[i], y + dy[i]
-        if storage[nx][ny] == "0":  # 외부랑 연결되어 있으면
+        if storage[nx][ny] == "0":
             storage[x][y] = "0"
-            outside = True         
+            flag = True
             break
     
-    if outside:
+    if flag:
         for i in range(4):
             nx, ny = x + dx[i], y + dy[i]
-            if storage[nx][ny] == "1":  # 빈 공간을 외부랑 연결 "1" -> "0"
+            if storage[nx][ny] == "1":
                 storage[nx][ny] = "0"
-                isOutside(storage, nx, ny)  # 붙어있는 빈 공간을 더 찾기
+                update(storage, nx, ny)
+
 
 def solution(storage, requests):
     answer = 0
-    # 0 = 외부랑 연결된 곳, 1 = 사방이 막힌 빈 공간
-    storage = [list("0" + i + "0") for i in storage]    # 테두리를 "0"으로 채우기
+    
+    # storage padding
+    storage = [list("0" + row + "0") for row in storage]
     storage.insert(0, list("0" * len(storage[0])))
     storage.append(list("0" * len(storage[0])))
-
-    for q in requests:
-        if len(q) == 1:
-            fork(storage, q)
-        else:
-            crane(storage, q[0])
     
-    for i in range(1, len(storage)-1):
-        for j in range(1, len(storage[0])-1):
+    for request in requests:
+        if len(request) == 1:
+            fork(storage, request)
+        else:
+            crane(storage, request[0])
+    
+    for i in range(1, len(storage) - 1):
+        for j in range(1, len(storage[0]) - 1):
             if storage[i][j] not in ["0", "1"]:
                 answer += 1
     
