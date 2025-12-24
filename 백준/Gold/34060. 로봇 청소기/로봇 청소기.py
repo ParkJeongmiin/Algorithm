@@ -1,49 +1,61 @@
 import sys
-from collections import deque
 
 # ----- input -----
 input = sys.stdin.readline
-
 N = int(input())
-ys = [int(input()) - 1 for _ in range(N)]
+
 
 # ----- code -----
-# 최솟값 알고리즘
-maps = set()
-cur_x, last_y = 0, -1
-for y in ys:
-    if y <= last_y:  # greedy 한 줄에 최대한 많이 위치시키기
-        cur_x += 1
+def find(node):
+    if parents[node] < 0:  # 찾는 노드가 root 노드인 경우
+        return node
 
-    maps.add((y, cur_x))
-    last_y = y
+    parents[node] = find(parents[node])
+    return parents[node]
 
-visited = set()
-min_answer = 0
-dy = [-1, 1, 0, 0]
-dx = [0, 0, -1, 1]
 
-for coord in maps:
-    # 이미 방문 처리 된 곳은 넘어가기
-    if coord in visited:
-        continue
+def union(a, b):
+    a = find(a)  # root node 번호
+    b = find(b)  # root node 번호
 
-    # 새로운 영역은 정답 +1
-    min_answer += 1
-    visited.add(coord)  # 방문 처리
-    queue = deque([coord])
+    if a == b:  # 이미 같은 그룹인 경우
+        return
 
-    # 주변 영역 탐색
-    while queue:
-        cy, cx = queue.popleft()
+    if parents[a] > parents[b]:
+        a, b = b, a
 
-        for i in range(4):
-            ny, nx = cy + dy[i], cx + dx[i]
+    parents[a] += parents[b]  # 자식 노드 수 업데이트
+    parents[b] = a  # root node 번호 지정
 
-            # 오염이 있고, 새로운 곳이라면 (방문처리), (주변 영역 큐에 넣기)
-            if (ny, nx) in maps and (ny, nx) not in visited:
-                visited.add((ny, nx))
-                queue.append((ny, nx))
 
-print(min_answer)
+parents = [-1] * N  # 부모 노드 정보
+prev_col = dict()  # 이전 열 y 좌표들의 노드 번호
+now_col = dict()  # 현재 열 y 좌표들의 노드 번호
+
+prev = int(input())
+now_col[prev] = 0  # 제일 처음 노드 저장
+
+for node in range(1, N):  # 1번 노드 부터 순회
+    y = int(input())
+
+    if y - prev == 1:  # 정확하게 한 개 차이 나면 노드 병합
+        union(node, node - 1)
+    elif y <= prev:  # 다음 열로 이동
+        prev_col = now_col
+        now_col = dict()
+
+    # 이전 열, 같은 행에 노드가 존재하면 노드 병합
+    if y in prev_col:
+        union(node, prev_col[y])
+
+    # 모든 노드 병합, 열 이동을 마친 후, 현재 노드 정보 업데이트
+    now_col[y] = node
+    prev = y
+
+answer = 0
+for node in parents:
+    if node < 0:
+        answer += 1
+
+print(answer)
 print(N)
