@@ -1,0 +1,20 @@
+WITH RECURSIVE GenerationCTE AS (
+    -- 1. 초기 세대 계산
+    SELECT ID, PARENT_ID, 1 AS GENERATION
+    FROM ECOLI_DATA
+    WHERE PARENT_ID IS NULL
+    
+    UNION ALL
+    
+    -- 2. Recursive: 재귀를 통한 다음 세대 계산
+    SELECT E.ID, E.PARENT_ID, G.GENERATION + 1
+    FROM ECOLI_DATA E
+    INNER JOIN GenerationCTE G ON E.PARENT_ID = G.ID
+)
+-- 3. 자식 개체가 없는 개체 필터링 및 세대별 개수 계산
+SELECT COUNT(P.ID) AS COUNT, P.GENERATION
+FROM GenerationCTE P
+LEFT JOIN GenerationCTE C ON P.ID = C.PARENT_ID
+WHERE C.ID IS NULL
+GROUP BY P.GENERATION
+ORDER BY P.GENERATION
