@@ -1,0 +1,19 @@
+WITH RECURSIVE GENCTE AS (
+    -- 1. 1세대 개체 찾기
+    SELECT ID, PARENT_ID, 1 AS GEN
+    FROM ECOLI_DATA
+    WHERE PARENT_ID IS NULL
+    
+    UNION ALL
+    
+    -- 2. RECURSIVE: 부모-자식 관계를 타고 내려가면서 세대의 번호 부여
+    SELECT E.ID, E.PARENT_ID, G.GEN + 1
+    FROM ECOLI_DATA E
+    INNER JOIN GENCTE G ON E.PARENT_ID = G.ID
+)
+
+-- 3. 결과 필터링: 3세대에 해당하는 데이터만 추출
+SELECT ID
+FROM GENCTE
+WHERE GEN = 3
+ORDER BY ID ASC
