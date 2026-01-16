@@ -1,0 +1,13 @@
+SELECT ID, 
+        CASE
+            WHEN PERC = 1 THEN 'CRITICAL'
+            WHEN PERC = 2 THEN 'HIGH'
+            WHEN PERC = 3 THEN 'MEDIUM'
+            ELSE 'LOW'
+        END AS COLONY_NAME
+FROM (
+    SELECT ID, 
+        NTILE(4) OVER (ORDER BY SIZE_OF_COLONY DESC) AS PERC
+    FROM ECOLI_DATA
+) AS SUB
+ORDER BY ID ASC
