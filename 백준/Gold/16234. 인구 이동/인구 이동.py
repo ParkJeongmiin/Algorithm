@@ -10,6 +10,8 @@ maps = [list(map(int, input().split())) for _ in range(N)]
 # ----- code -----
 # initial settings
 answer = 0
+candidates = deque([(r, c) for r in range(N) for c in range(N)])
+visited = [[-1] * N for _ in range(N)]
 dy = [-1, 1, 0, 0]
 dx = [0, 0, -1, 1]
 
@@ -17,10 +19,10 @@ dx = [0, 0, -1, 1]
 # bfs 정의
 def bfs(r, c, visited):
     queue = deque([(r, c)])
-    visited[r][c] = True
+    visited[r][c] = answer  # 방문처리 memoization - 메모리 절약
 
-    groups = [(r, c)]  # 연합에 속한 나라들의 좌표 리스트
-    counts = maps[r][c]  # 연합의 총 인구수
+    groups = [(r, c)]
+    total_counts = maps[r][c]
 
     while queue:
         y, x = queue.popleft()
@@ -28,46 +30,50 @@ def bfs(r, c, visited):
         for i in range(4):
             ny, nx = y + dy[i], x + dx[i]
 
-            # 범위 내에 있고, 아직 방문하지 않았다면
-            if 0 <= nx < N and 0 <= ny < N and not visited[ny][nx]:
-                # 국경선을 공유하는 두 나라의 인구 차이 계산
-                diff = abs(maps[y][x] - maps[ny][nx])
-
-                # 인구 차이가 L 이상 R 이하인 경우 (국경선 오픈)
-                if L <= diff <= R:
-                    visited[ny][nx] = True
+            if 0 <= ny < N and 0 <= nx < N and visited[ny][nx] != answer:
+                if L <= abs(maps[y][x] - maps[ny][nx]) <= R:
+                    visited[ny][nx] = answer
                     queue.append((ny, nx))
                     groups.append((ny, nx))
-                    counts += maps[ny][nx]
+                    total_counts += maps[ny][nx]
 
-    return groups, counts
+    return groups, total_counts
 
 
 # main
 while True:
-    visited = [[False] * N for _ in range(N)]
-    moved_flag = False  # 인구 이동 확인 flag
+    next_candidates = set()  # 다음 날 확인해 볼 좌표들
+    moved_flag = False
 
-    # 모든 좌표 순회, 연합 시작점 탐색
-    for r in range(N):
-        for c in range(N):
-            if not visited[r][c]:
-                groups, counts = bfs(r, c, visited)
+    for _ in range(len(candidates)):
+        r, c = candidates.popleft()
 
-                # 연합에 속한 나라가 2개 이상인 경우
-                # 인구 이동 발생
-                if len(groups) > 1:
-                    moved_flag = True
-                    new_counts = counts // len(groups)
+        if visited[r][c] == answer:  # 탐색하는 당일에 방문한 곳이면 넘어가기
+            continue
 
-                    for y, x in groups:
-                        maps[y][x] = new_counts
+        # BFS 로직 시작
+        groups, total_counts = bfs(r, c, visited)
 
-    # 모든 좌표를 돌았는데 인구 이동이 없었다면 과정 종료
+        # 연합에 속한 나라가 2개 이상인 경우
+        # 인구 이동 발생
+        if len(groups) > 1:
+            moved_flag = True
+            new_counts = total_counts // len(groups)
+
+            for y, x in groups:
+                maps[y][x] = new_counts
+
+                # 탐색 범위 제한 - 변화된 나라와 주변국만 저장
+                next_candidates.add((y, x))
+                for i in range(4):
+                    ny, nx = y + dy[i], x + dx[i]
+                    if 0 <= ny < N and 0 <= nx < N:
+                        next_candidates.add((ny, nx))
+
     if not moved_flag:
         break
 
     answer += 1
-
+    candidates = deque(list(next_candidates))
 
 print(answer)
