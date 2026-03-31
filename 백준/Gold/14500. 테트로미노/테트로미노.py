@@ -6,15 +6,17 @@ N, M = map(int, input().split())
 
 # ----- code -----
 # initial settings
-answer = 0
-maps = []
 visited = [[False] * M for _ in range(N)]
-dy = [-1, 1, 0, 0]
-dx = [0, 0, -1, 1]
-
+maps = []
 for _ in range(N):
     layer = list(map(int, input().split()))
     maps.append(layer)
+
+dy = [-1, 1, 0, 0]
+dx = [0, 0, -1, 1]
+
+answer = 0
+max_value = max(map(max, maps))
 
 
 # dfs
@@ -23,6 +25,9 @@ def dfs(y, x, depth, val):
 
     if depth == 4:  # 기저 조건
         answer = max(answer, val)
+        return
+
+    if answer >= val + max_value * (4 - depth):  # 호출 스택 효율을 위한 가지 치기
         return
 
     for i in range(4):  # 상하좌우 순회
@@ -41,7 +46,7 @@ for y in range(N):
         dfs(y, x, 1, maps[y][x])
         visited[y][x] = False
 
-        # 'ㅏ' 모양 예외 처리
+        # 'ㅗ' 모양 예외 처리
         center = maps[y][x]
 
         target_list = []
