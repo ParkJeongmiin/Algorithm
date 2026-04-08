@@ -8,7 +8,7 @@ def get_lcm(number_list):
 
 def check(t, signal):
     G, Y, R = signal
-    return True if 1 <= (t % (G + Y + R)) - G <= Y else False
+    return 1 <= (t % (G + Y + R)) - G <= Y
     
 
 def solution(signals):
@@ -16,13 +16,9 @@ def solution(signals):
     max_time = get_lcm(cycle_time)
     t = 0
     
-    while t <= max_time:
-        t += 1
-        
+    for t in range(1, max_time + 1):
         for s in signals:
-            if check(t, s):
-                continue
-            else:
+            if not check(t, s): # 하나라도 노란불 아니면 다음 시간 탐색
                 break
         else:
             return t
