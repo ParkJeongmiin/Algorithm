@@ -2,8 +2,8 @@ import math
 from functools import reduce
 
 
-def lcm(number_list):
-    return math.prod(number_list) // reduce(math.gcd, number_list)
+def get_lcm(number_list):
+    return reduce(lambda a, b: a * b // math.gcd(a, b), number_list)
 
 
 def check(t, signal):
@@ -13,7 +13,7 @@ def check(t, signal):
 
 def solution(signals):
     cycle_time = list(sum(s) for s in signals)
-    max_time = lcm(cycle_time)
+    max_time = get_lcm(cycle_time)
     t = 0
     
     while t <= max_time:
