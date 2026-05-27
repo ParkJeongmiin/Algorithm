@@ -23,32 +23,26 @@ def solution(grid):
         
         # 종료 조건 : 도착 지점에 도착했을 때
         if (y == n - 1) and (x == m - 1):
-            is_valid = True
-            
             for i in range(n):
                 for j in range(m):
                     # 기존 설치된 선로를 모두 통과했는지 검증
                     if initial_grid[i][j] > 0 and visited[i][j] == 0:
-                        is_valid = False
-                        break
+                        return
                     
                     # 3번 선로를 2번 통과했는지 검증
                     if grid[i][j] == 3 and visited[i][j] != 2:
-                        is_valid = False
-                        break
-                
-                if not is_valid:
-                    break
-            
-            if is_valid:
-                answer += 1
-            
+                        return
+            answer += 1            
             return
         
         # 다음 탐색해야 할 cell 좌표 계산 - (y, x)의 레일과 방향에 의해 결정
         ny = y + dy[curr_dir]
         nx = x + dx[curr_dir]
         
+        # 범위를 벗어나거나 장애물을 만나면 탐색 제외
+        if ny < 0 or ny >= n or nx < 0 or nx >= m or grid[ny][nx] == -1:
+            return
+                
         # (ny, nx)에 들어갈 수 있는 방향
         for next_dir in range(4):
             # 역방향 탐색 제외
@@ -59,9 +53,6 @@ def solution(grid):
             required_rail = mapping_table[curr_dir][next_dir]
             is_straight = (curr_dir == next_dir)
             
-            # 범위를 벗어나거나 장애물을 만나면 탐색 제외
-            if ny < 0 or ny >= n or nx < 0 or nx >= m or grid[ny][nx] == -1:
-                continue
                 
             # 탐색할 칸이 비어있는 경우
             if grid[ny][nx] == 0:
