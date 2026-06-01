@@ -45,22 +45,23 @@ def solution(h, grid, panels, seqs):
     dist_info = [[-1] * (k + 1) for _ in range(k)] # 패널-(패널, 엘리베이터) 간 거리 정보
     for si, (sf, sr, sc) in enumerate(panels):
         dist_map = bfs(sr - 1, sc - 1)
-        
-        # 엘리베이터 거리 저장
-        dist_info[si][-1] = dist_map[elevator[0]][elevator[1]]        
+        dist_info[si][-1] = dist_map[elevator[0]][elevator[1]]  # 엘리베이터 거리 저장
 
         # 같은 층에 있는 패널과의 거리 저장
         for ei, (ef, er, ec) in enumerate(panels):
             if si == ei:
                 dist_info[si][ei] = 0
-                continue
+            elif sf == ef and dist_info[si][ei] == -1:
+                dist_info[si][ei] = dist_info[ei][si] = dist_map[er - 1][ec - 1]
                 
-            if dist_info[si][ei] != -1: # 자기 자신 or 이미 계산된 거리는 제외
-                continue
-
-            if sf == ef:
-                dist_info[si][ei] = dist_map[er - 1][ec - 1]
-                dist_info[ei][si] = dist_map[er - 1][ec - 1]
+    # 이동 거리 사전 계산
+    move_costs = [[0] * k for _ in range(k)]
+    for i in range(k):
+        for j in range(k):
+            if panels[i][0] == panels[j][0]:
+                move_costs[i][j] = dist_info[i][j]
+            else:
+                move_costs[i][j] = dist_info[i][-1] + dist_info[j][-1] + abs(panels[i][0] - panels[j][0])
 
     # 제약 조건 정리 bit 연산을 통해 사전 조건 표현 : prereq_mask
     prereq_mask = [0] * k
@@ -93,14 +94,8 @@ def solution(h, grid, panels, seqs):
             if (curr_state & prereq_mask[next_panel]) != prereq_mask[next_panel]: # 목표 패널의 제약 조건을 만족하지 않으면 제외
                 continue
             
-            # 현재, 다음 패널 간의 거리 계산(같은 층, 다른 층 분기 처리)
-            if panels[curr_panel][0] == panels[next_panel][0]:
-                tmp_time = dist_info[curr_panel][next_panel]
-            else:
-                tmp_time = dist_info[curr_panel][-1] + dist_info[next_panel][-1] + abs(panels[curr_panel][0] - panels[next_panel][0])
-            
             # 목표를 기준으로 다음 시간과 활성화 마스크 계산
-            next_time = curr_time + tmp_time
+            next_time = curr_time + move_costs[curr_panel][next_panel]
             next_state = curr_state | (1 << next_panel)
             
             # next_time이 기존 기록된 기록보다 작으면 dp_table 갱신 + heapq에 추가
